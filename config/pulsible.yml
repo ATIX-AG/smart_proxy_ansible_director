@@ -1,0 +1,13 @@
+---
+#
+# Configuration file for 'pulsible' plugin
+#
+
+# Can be true, false, or http/https to enable just one of the protocols
+:enabled: true
+
+# override :required_setting here, by default it is set to 'default_value'
+# :required_setting: non-default-value
+# :example_setting is an optional setting. Comment out the next line to leave it unset
+:example_setting: example
+:optional_path: /optional/path
