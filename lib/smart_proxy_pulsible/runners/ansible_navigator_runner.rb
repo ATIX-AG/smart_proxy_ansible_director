@@ -56,7 +56,7 @@ module Proxy
                   arguments:
                     - "--tls-verify=false"
                     - "--authfile=$AUTHFILE"
-                  policy: always
+                  policy: missing
               logging:
                 level: debug
               mode: stdout

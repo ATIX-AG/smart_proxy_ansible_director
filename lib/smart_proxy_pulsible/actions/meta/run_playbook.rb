@@ -7,7 +7,7 @@ module Proxy
     module Actions
       module Meta
 
-        class BuildPushEe < ::Proxy::Dynflow::Action::Runner
+        class RunPlaybook < ::Proxy::Dynflow::Action::Runner
 
 =begin
           "action_input": {
@@ -31,26 +31,24 @@ module Proxy
           def plan(args)
 
             _execution_environment = args["execution_environment"]
-            ee_id = _execution_environment["id"]
-            _execution_environment_content = _execution_environment["content"]
-            ee_base_image = _execution_environment_content["base_image"]
-            ee_base_image_tag = _execution_environment_content["latest"]
-            ee_ansible_core_version = _execution_environment_content["ansible_core_version"]
-            ee_formatted_content = ::Proxy::Pulsible::Helpers::ExecutionEnvironmentHelpers.format_content(
-              _execution_environment_content["content_units"]
+            _inventory = args["inventory"]
+            _playbook = args["playbook"]
+            content = ::Proxy::Pulsible::Helpers::ExecutionEnvironmentHelpers.format_content(
+              args["content"]
             )
-
 
             sequence do
               plan_action ::Proxy::Pulsible::Actions::BuildExecutionEnvironment,  {
-                ee_id: ee_id,
-                ee_base_image: ee_base_image,
-                ee_base_image_tag: ee_base_image_tag,
-                ee_ansible_core_version: ee_ansible_core_version,
-                ee_formatted_content: ee_formatted_content
+                ee_id: @caller_execution_plan_id,
+                ee_base_image: _execution_environment,
+                ee_base_image_tag: @caller_execution_plan_id,
+                ee_ansible_core_version: "2.19.0", # TODO: Get from EE
+                ee_formatted_content: content
               }
-              plan_action ::Proxy::Pulsible::Actions::PushExecutionEnvironment, {
-                ee_id: ee_id,
+              plan_action ::Proxy::Pulsible::Actions::RunAnsibleNavigator, {
+                inventory: _inventory,
+                playbook: _playbook,
+                execution_environment: "#{@caller_execution_plan_id}:#{@caller_execution_plan_id}",
               }
               # TODO: Callback to foreman with metadata
             end

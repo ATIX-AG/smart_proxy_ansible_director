@@ -16,6 +16,7 @@ module Proxy
         def initialize(ansible_builder_input, suspended_action: nil)
           @ee_id = ansible_builder_input[:ee_id]
           @ee_base_image = ansible_builder_input[:ee_base_image]
+          @ee_base_image_tag = ansible_builder_input[:ee_base_image_tag]
           @ee_ansible_core_version = ansible_builder_input[:ee_ansible_core_version]
           @ee_formatted_content = ansible_builder_input[:ee_formatted_content]
           super suspended_action: suspended_action
@@ -40,6 +41,7 @@ module Proxy
               "ansible_runner" => {
                 "package_pip" => 'ansible-runner'
               },
+              "system" => ["openssh-clients"],
               "galaxy" => @ee_formatted_content.to_hash
             }
           }.compact
@@ -62,7 +64,7 @@ module Proxy
             cat <<EOF > "execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:latest -vvv --file execution-environment.yml #{build_args_str}
+            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -vvv --extra-build-cli-args='--tls-verify=false' --file execution-environment.yml #{build_args_str}
           CMD
           initialize_command('bash', '-c', cmd)
         end
