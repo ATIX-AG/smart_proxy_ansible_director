@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.description = "A longer description of the plugin for Foreman's smart proxy"
 
   s.files       = Dir['{config,lib,bundler.d}/**/*'] + ['README.md', 'LICENSE']
+  s.require_paths = ['lib']
   s.test_files  = Dir['test/**/*']
 
   s.add_development_dependency('rake')

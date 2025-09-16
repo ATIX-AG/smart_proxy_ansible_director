@@ -2,7 +2,7 @@ require_relative 'version'
 
 module Proxy
   module AnsibleDirector
-    class Plugin < ::Proxy::Plugin
+    class Plugin < Proxy::Plugin
       plugin :ansible_director, ::Proxy::AnsibleDirector::VERSION
       rackup_path File.expand_path('http_config.ru', __dir__)
 
