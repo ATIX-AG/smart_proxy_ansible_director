@@ -1,7 +1,7 @@
 
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Actions
       class PushExecutionEnvironment < ::Proxy::Dynflow::Action::Runner
 
@@ -10,7 +10,7 @@ module Proxy
         end
 
         def initiate_runner
-          ::Proxy::Pulsible::Runners::PodmanPushRunner.new(input[:push_ee_input])
+          ::Proxy::AnsibleDirector::Runners::PodmanPushRunner.new(input[:push_ee_input])
         end
       end
     end

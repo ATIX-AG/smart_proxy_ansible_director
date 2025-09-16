@@ -1,5 +1,5 @@
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     class Api < ::Sinatra::Base
       helpers ::Proxy::Helpers
 

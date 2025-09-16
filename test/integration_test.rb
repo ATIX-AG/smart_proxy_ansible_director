@@ -1,9 +1,9 @@
 require 'test_helper'
 require 'root/root_v2_api'
-require 'smart_proxy_pulsible'
+require 'smart_proxy_ansible_director'
 
 # Test that the plugin loads and the Smart Proxy reports the correct feature
-class PulsibleFeaturesTest < Test::Unit::TestCase
+class AnsibleDirectorFeaturesTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
   def app
@@ -12,7 +12,7 @@ class PulsibleFeaturesTest < Test::Unit::TestCase
   end
 
   def load_config(*args, **kwargs)
-    Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('pulsible.yml').returns(*args, **kwargs)
+    Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('ansible_director.yml').returns(*args, **kwargs)
   end
 
   def failed_module_log

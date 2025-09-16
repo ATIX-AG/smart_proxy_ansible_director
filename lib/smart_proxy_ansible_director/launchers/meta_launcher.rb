@@ -3,9 +3,9 @@
 require 'smart_proxy_dynflow/task_launcher'
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Launchers
-      class AnsibleNavigatorLauncher < ::Proxy::Dynflow::TaskLauncher::Batch
+      class MetaLauncher < ::Proxy::Dynflow::TaskLauncher::Batch
       end
     end
   end

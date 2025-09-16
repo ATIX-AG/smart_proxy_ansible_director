@@ -1,23 +1,23 @@
 require_relative 'version'
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     class Plugin < ::Proxy::Plugin
-      plugin :pulsible, ::Proxy::Pulsible::VERSION
+      plugin :ansible_director, ::Proxy::AnsibleDirector::VERSION
       rackup_path File.expand_path('http_config.ru', __dir__)
 
 
       load_classes do
         require 'smart_proxy_dynflow'
-        require 'smart_proxy_pulsible/launchers'
-        require 'smart_proxy_pulsible/actions'
-        require 'smart_proxy_pulsible/runners'
+        require 'smart_proxy_ansible_director/launchers'
+        require 'smart_proxy_ansible_director/actions'
+        require 'smart_proxy_ansible_director/runners'
       end
 
       load_dependency_injection_wirings do |_container_instance, _settings|
-        Proxy::Dynflow::TaskLauncherRegistry.register('ansible-builder', ::Proxy::Pulsible::Launchers::AnsibleBuilderLauncher)
-        Proxy::Dynflow::TaskLauncherRegistry.register('ansible-navigator', ::Proxy::Pulsible::Launchers::AnsibleNavigatorLauncher)
-        Proxy::Dynflow::TaskLauncherRegistry.register('meta', ::Proxy::Pulsible::Launchers::MetaLauncher)
+        Proxy::Dynflow::TaskLauncherRegistry.register('ansible-builder', ::Proxy::AnsibleDirector::Launchers::AnsibleBuilderLauncher)
+        Proxy::Dynflow::TaskLauncherRegistry.register('ansible-navigator', ::Proxy::AnsibleDirector::Launchers::AnsibleNavigatorLauncher)
+        Proxy::Dynflow::TaskLauncherRegistry.register('meta', ::Proxy::AnsibleDirector::Launchers::MetaLauncher)
       end
 
       # Settings listed under default_settings are required.

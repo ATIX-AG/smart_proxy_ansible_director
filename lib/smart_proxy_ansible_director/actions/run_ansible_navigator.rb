@@ -1,7 +1,7 @@
 
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Actions
       class RunAnsibleNavigator < ::Proxy::Dynflow::Action::Runner
 
@@ -10,7 +10,7 @@ module Proxy
         end
 
         def initiate_runner
-          ::Proxy::Pulsible::Runners::AnsibleNavigatorRunner.new(input[:args])
+          ::Proxy::AnsibleDirector::Runners::AnsibleNavigatorRunner.new(input[:args])
         end
       end
     end

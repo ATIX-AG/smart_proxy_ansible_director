@@ -1,1 +1,1 @@
-gem 'smart_proxy_pulsible'
+gem 'smart_proxy_ansible_director'

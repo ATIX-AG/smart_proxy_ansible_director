@@ -1,4 +1,4 @@
-# SmartProxyPulsible
+# SmartProxyAnsibleDirector
 
 *Introduction here*
 

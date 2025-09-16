@@ -1,12 +1,12 @@
 require 'test_helper'
-require 'smart_proxy_pulsible/api'
+require 'smart_proxy_ansible_director/api'
 
 # Test that API returns the correct responses
-class PulsibleApiTest < Test::Unit::TestCase
+class AnsibleDirectorApiTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
   def app
-    Proxy::Pulsible::Api.new
+    Proxy::AnsibleDirector::Api.new
   end
 
   def test_root

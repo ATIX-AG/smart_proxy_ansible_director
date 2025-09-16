@@ -1,7 +1,7 @@
 require 'smart_proxy_dynflow/runner/process_manager_command'
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Runners
       class AnsibleBuilderRunner < ::Proxy::Dynflow::Runner::Base
         include ::Proxy::Dynflow::Runner::ProcessManagerCommand

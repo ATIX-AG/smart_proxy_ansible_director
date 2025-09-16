@@ -1,6 +1,6 @@
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Helpers
       class ExecutionEnvironmentHelpers
         class << self

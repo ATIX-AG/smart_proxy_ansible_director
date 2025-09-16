@@ -1,5 +1,5 @@
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Actions
       class BuildExecutionEnvironment < ::Proxy::Dynflow::Action::Runner
 
@@ -14,7 +14,7 @@ module Proxy
         end
 
         def initiate_runner
-          ::Proxy::Pulsible::Runners::AnsibleBuilderRunner.new(input[:build_ee_input])
+          ::Proxy::AnsibleDirector::Runners::AnsibleBuilderRunner.new(input[:build_ee_input])
         end
 
       end

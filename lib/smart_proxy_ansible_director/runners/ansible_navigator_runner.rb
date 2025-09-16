@@ -2,15 +2,15 @@ require 'smart_proxy_dynflow/runner/process_manager_command'
 require_relative '../helpers/ansible_navigator_helpers'
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Runners
       class AnsibleNavigatorRunner < ::Proxy::Dynflow::Runner::Base
         include ::Proxy::Dynflow::Runner::ProcessManagerCommand
 
         def initialize(ansible_input, suspended_action: nil)
           super suspended_action: suspended_action
-          @inventory = ::Proxy::Pulsible::Helpers::AnsibleNavigatorHelpers.reserialize_inventory(ansible_input[:inventory])
-          @playbook = ::Proxy::Pulsible::Helpers::AnsibleNavigatorHelpers.reserialize_playbook(ansible_input[:playbook])
+          @inventory = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_inventory(ansible_input[:inventory])
+          @playbook = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_playbook(ansible_input[:playbook])
           @execution_environment = ansible_input[:execution_environment]
         end
 

@@ -2,7 +2,7 @@ require 'smart_proxy_dynflow/runner/process_manager_command'
 require_relative '../helpers/ansible_navigator_helpers'
 
 module Proxy
-  module Pulsible
+  module AnsibleDirector
     module Runners
       class PodmanPushRunner < ::Proxy::Dynflow::Runner::Base
         include ::Proxy::Dynflow::Runner::ProcessManagerCommand
