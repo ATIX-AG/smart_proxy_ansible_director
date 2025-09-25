@@ -1,19 +1,17 @@
-# SmartProxyAnsibleDirector
+# Smart Proxy Ansible Director
 
-*Introduction here*
+Smart Proxy plugin to make [foreman_ansible_director](https://github.com/ATIX-AG/foreman_ansible_director) actions run on Smart Proxies.
 
 ## Installation
 
 See [How_to_Install_a_Smart-Proxy_Plugin](http://projects.theforeman.org/projects/foreman/wiki/How_to_Install_a_Smart-Proxy_Plugin)
 for how to install Smart Proxy plugins
 
-This plugin is compatible with Smart Proxy 2.3 or higher.
+This plugin is compatible with Smart Proxy 3.16 or higher.
 
 ## Configuration
 
-Configuration options for this plugin are in `/etc/foreman-proxy/settings.d/pulsible.yml` and include:
-
-* example_setting: change this as an example
+Configuration options for this plugin are in `/etc/foreman-proxy/settings.d/ansible_director.yml`.
 
 ## Contributing
 
@@ -21,7 +19,7 @@ Fork and send a Pull Request. Thanks!
 
 ## Copyright
 
-Copyright (c) *year* *your name*
+Copyright (c) 2025 ATIX AG - https://atix.de
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
