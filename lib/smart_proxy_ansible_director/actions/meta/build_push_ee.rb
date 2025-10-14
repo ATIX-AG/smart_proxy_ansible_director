@@ -34,7 +34,7 @@ module Proxy
             ee_id = _execution_environment["id"]
             _execution_environment_content = _execution_environment["content"]
             ee_base_image = _execution_environment_content["base_image"]
-            ee_base_image_tag = _execution_environment_content["latest"]
+            ee_base_image_tag = "latest"
             ee_ansible_core_version = _execution_environment_content["ansible_core_version"]
             ee_formatted_content = ::Proxy::AnsibleDirector::Helpers::ExecutionEnvironmentHelpers.format_content(
               _execution_environment_content["content_units"]

@@ -1,6 +1,7 @@
 require_relative '../build_execution_environment'
 require_relative '../push_execution_environment'
 require_relative '../../helpers/execution_environment_helpers'
+require 'smart_proxy_dynflow/callback'
 
 module Proxy
   module AnsibleDirector
@@ -38,19 +39,21 @@ module Proxy
             )
 
             sequence do
-              plan_action ::Proxy::AnsibleDirector::Actions::BuildExecutionEnvironment, {
+              build_ee_action = plan_action ::Proxy::AnsibleDirector::Actions::BuildExecutionEnvironment, {
                 ee_id: @caller_execution_plan_id,
                 ee_base_image: _execution_environment,
                 ee_base_image_tag: @caller_execution_plan_id,
                 ee_ansible_core_version: "2.19.0", # TODO: Get from EE
                 ee_formatted_content: content
               }
-              plan_action ::Proxy::AnsibleDirector::Actions::RunAnsibleNavigator, {
+              run_ansible_action = plan_action ::Proxy::AnsibleDirector::Actions::RunAnsibleNavigator, {
                 inventory: _inventory,
                 playbook: _playbook,
                 execution_environment: "#{@caller_execution_plan_id}:#{@caller_execution_plan_id}",
               }
-              # TODO: Callback to foreman with metadata
+              plan_action ::Proxy::Dynflow::Callback::Action,
+                          args[:callback],
+                          run_ansible_action.output
             end
           end
         end
