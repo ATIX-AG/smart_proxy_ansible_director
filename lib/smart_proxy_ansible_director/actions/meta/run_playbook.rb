@@ -34,13 +34,16 @@ module Proxy
             _execution_environment = args["execution_environment"]
             _inventory = args["inventory"]
             _playbook = args["playbook"]
+            variables = args["variables"]
             content = ::Proxy::AnsibleDirector::Helpers::ExecutionEnvironmentHelpers.format_content(
               args["content"]
             )
 
+            puts _execution_environment
+
             sequence do
               build_ee_action = plan_action ::Proxy::AnsibleDirector::Actions::BuildExecutionEnvironment, {
-                ee_id: @caller_execution_plan_id,
+                ee_id: _execution_environment.split('/')[-1],
                 ee_base_image: _execution_environment,
                 ee_base_image_tag: @caller_execution_plan_id,
                 ee_ansible_core_version: "2.19.0", # TODO: Get from EE
@@ -49,7 +52,8 @@ module Proxy
               run_ansible_action = plan_action ::Proxy::AnsibleDirector::Actions::RunAnsibleNavigator, {
                 inventory: _inventory,
                 playbook: _playbook,
-                execution_environment: "#{@caller_execution_plan_id}:#{@caller_execution_plan_id}",
+                variables: variables,
+                execution_environment: "#{_execution_environment.split('/')[-1]}:#{@caller_execution_plan_id}",
               }
               plan_action ::Proxy::Dynflow::Callback::Action,
                           args[:callback],
