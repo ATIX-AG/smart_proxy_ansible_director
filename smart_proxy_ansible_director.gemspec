@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.test_files  = Dir['test/**/*']
 
+  s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.9')
+
   s.add_development_dependency('rake')
   s.add_development_dependency('mocha')
   s.add_development_dependency('test-unit')
