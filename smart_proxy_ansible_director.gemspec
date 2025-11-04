@@ -6,14 +6,17 @@ Gem::Specification.new do |s|
   s.license     = 'GPL-3.0'
   s.authors     = ['Thorben Denzer']
   s.email       = ['denzer@atix.de']
-  s.homepage    = 'https://github.com/theforeman/smart_proxy_pulsible'
+  s.homepage    = 'https://example.com'
 
   s.summary     = "A Plugin for Foreman's smart proxy"
   s.description = "A longer description of the plugin for Foreman's smart proxy"
 
-  s.files       = Dir['{config,lib,bundler.d}/**/*'] + ['README.md', 'LICENSE']
+  s.files       = Dir[
+      '{lib/smart_proxy_ansible_director,bundler.d,settings.d}/**/*',
+      'lib/smart_proxy_ansible_director.rb'
+  ] + %w[README.md LICENSE]
   s.require_paths = ['lib']
-  s.test_files  = Dir['test/**/*']
+  s.test_files  = s.files.grep(%r{^(test|spec|features)/})
 
   s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.9')
 
