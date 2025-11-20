@@ -47,7 +47,8 @@ module Proxy
                 ee_base_image: _execution_environment,
                 ee_base_image_tag: @caller_execution_plan_id,
                 ee_ansible_core_version: "2.19.0", # TODO: Get from EE
-                ee_formatted_content: content
+                ee_formatted_content: content,
+                is_base_image: false
               }
               run_ansible_action = plan_action ::Proxy::AnsibleDirector::Actions::RunAnsibleNavigator, {
                 inventory: _inventory,

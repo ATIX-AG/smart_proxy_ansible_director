@@ -47,12 +47,12 @@ module Proxy
                 ee_base_image: ee_base_image,
                 ee_base_image_tag: ee_base_image_tag,
                 ee_ansible_core_version: ee_ansible_core_version,
-                ee_formatted_content: ee_formatted_content
+                ee_formatted_content: ee_formatted_content,
+                is_base_image: true
               }
               plan_action ::Proxy::AnsibleDirector::Actions::PushExecutionEnvironment, {
                 ee_id: ee_id,
               }
-              # TODO: Callback to foreman with metadata
             end
           end
         end

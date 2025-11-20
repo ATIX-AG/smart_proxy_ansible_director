@@ -19,16 +19,32 @@ module Proxy
           @ee_base_image_tag = ansible_builder_input[:ee_base_image_tag]
           @ee_ansible_core_version = ansible_builder_input[:ee_ansible_core_version]
           @ee_formatted_content = ansible_builder_input[:ee_formatted_content]
+          @is_base_image = ansible_builder_input[:is_base_image]
           super suspended_action: suspended_action
         end
 
         def start
 
+          ee_content = @ee_formatted_content.to_hash
+
+          if @is_base_image
+              ee_content.merge!(
+                  { "collections" => [
+                      {
+                        "name" => "theforeman.foreman",
+                        "version" => "5.6.0",
+                        "source" => "https://galaxy.ansible.com"
+                      }
+                    ]
+                  }
+                )
+          end
+
           ee_definition = {
             "version" => 3,
             "images" => {
               "base_image" => {
-                "name" => @ee_base_image
+                "name" => "localhost/ansibleng/1:latest"
               }
             },
             "dependencies" => {
@@ -42,8 +58,21 @@ module Proxy
                 "package_pip" => 'ansible-runner'
               },
               "system" => ["openssh-clients"],
-              "galaxy" => @ee_formatted_content.to_hash
-            }
+              "galaxy" => ee_content
+            },
+            "additional_build_steps" => (
+                {
+                    "prepend_base" => [
+                        "ENV ANSIBLE_CALLBACK_WHITELIST=theforeman.foreman.foreman",
+                        "ENV ANSIBLE_CALLBACKS_ENABLED=theforeman.foreman.foreman",
+                        "ENV FOREMAN_URL=#{Proxy::SETTINGS.foreman_url.to_s}",
+                        "ENV FOREMAN_SSL_CERT=/run/secrets/foreman_ssl_cert",
+                        "ENV FOREMAN_SSL_KEY=/run/secrets/foreman_ssl_key",
+                        "ENV FOREMAN_SSL_VERIFY=/run/secrets/foreman_ssl_verify",
+
+                ]
+                } unless @is_base_image
+            )
           }.compact
 
           build_args = {
@@ -57,15 +86,16 @@ module Proxy
           end
 
           cmd = <<~CMD
-            TMPDIR=$(mktemp -d /tmp/execution-environment_ctx_XXXXXX)
-            echo $TMPDIR
-            cd $TMPDIR       
-  
-            cat <<EOF > "execution-environment.yml"
-            #{YAML.dump(ee_definition, indentation: 2)}
-            EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -vvv --extra-build-cli-args='--tls-verify=false' --file execution-environment.yml #{build_args_str}
+              TMPDIR=$(mktemp -d /tmp/execution-environment_ctx_XXXXXX)
+              echo $TMPDIR
+              cd $TMPDIR       
+
+              cat <<EOF > "execution-environment.yml"
+              #{YAML.dump(ee_definition, indentation: 2)}
+              EOF
+              ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -vvv --extra-build-cli-args='--tls-verify=false' --file execution-environment.yml #{build_args_str}
           CMD
+
           initialize_command('bash', '-c', cmd)
         end
 
