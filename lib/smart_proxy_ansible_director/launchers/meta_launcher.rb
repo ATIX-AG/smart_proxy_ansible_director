@@ -10,4 +10,3 @@ module Proxy
     end
   end
 end
-

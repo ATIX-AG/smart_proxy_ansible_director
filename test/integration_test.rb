@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 require 'root/root_v2_api'
 require 'smart_proxy_ansible_director'
@@ -12,7 +14,9 @@ class AnsibleDirectorFeaturesTest < Test::Unit::TestCase
   end
 
   def load_config(*args, **kwargs)
-    Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('ansible_director.yml').returns(*args, **kwargs)
+    Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('ansible_director.yml').returns(
+      *args, **kwargs
+    )
   end
 
   def failed_module_log
@@ -34,7 +38,10 @@ class AnsibleDirectorFeaturesTest < Test::Unit::TestCase
     feature = get_feature
 
     assert_equal('failed', feature['state'], failed_module_log)
-    assert_equal("Disabling all modules in the group ['pulsible'] due to a failure in one of them: File at '/must/exist' defined in 'required_path' parameter doesn't exist or is unreadable", failed_module_log)
+    assert_equal(
+      "Disabling all modules in the group ['ansible_director'] due to a failure in one of them:
+ File at '/must/exist' defined in 'required_path' parameter doesn't exist or is unreadable", failed_module_log
+    )
   end
 
   def test_features_with_file_present

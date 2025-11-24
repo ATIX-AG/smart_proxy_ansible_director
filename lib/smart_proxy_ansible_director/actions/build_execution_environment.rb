@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Proxy
   module AnsibleDirector
     module Actions
       class BuildExecutionEnvironment < ::Proxy::Dynflow::Action::Runner
-
         # {
         #   ee_id: int,
         #   ee_name: '',
@@ -16,7 +17,6 @@ module Proxy
         def initiate_runner
           ::Proxy::AnsibleDirector::Runners::AnsibleBuilderRunner.new(input[:build_ee_input])
         end
-
       end
     end
   end

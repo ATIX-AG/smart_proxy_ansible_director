@@ -1,10 +1,9 @@
-
+# frozen_string_literal: true
 
 module Proxy
   module AnsibleDirector
     module Actions
       class RunAnsibleNavigator < ::Proxy::Dynflow::Action::Runner
-
         def plan(args)
           plan_self args: args
         end

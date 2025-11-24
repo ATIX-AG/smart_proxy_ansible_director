@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'smart_proxy_dynflow/runner/process_manager_command'
 require_relative '../helpers/ansible_navigator_helpers'
 
@@ -14,7 +16,6 @@ module Proxy
         end
 
         def start
-
           # TODO: Parametrize
 
           image_name = "ansibleng/#{@ee_id}:latest"

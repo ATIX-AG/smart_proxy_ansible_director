@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'smart_proxy_dynflow/runner/process_manager_command'
 
 module Proxy
@@ -24,59 +26,59 @@ module Proxy
         end
 
         def start
-
           ee_content = @ee_formatted_content.to_hash
 
           if @is_base_image
-              ee_content.merge!(
-                  { "collections" => [
-                      {
-                        "name" => "theforeman.foreman",
-                        "version" => "5.6.0",
-                        "source" => "https://galaxy.ansible.com"
-                      }
-                    ]
-                  }
-                )
+            ee_content.merge!(
+              { 'collections' => [
+                {
+                  'name' => 'theforeman.foreman',
+                  'version' => '5.6.0',
+                  'source' => 'https://galaxy.ansible.com'
+                }
+              ] }
+            )
           end
 
           ee_definition = {
-            "version" => 3,
-            "images" => {
-              "base_image" => {
-                "name" => "localhost/ansibleng/1:latest"
+            'version' => 3,
+            'images' => {
+              'base_image' => {
+                'name' => 'localhost/ansibleng/1:latest'
               }
             },
-            "dependencies" => {
-              "python_interpreter" => {
-                "package_system" => 'python3'
+            'dependencies' => {
+              'python_interpreter' => {
+                'package_system' => 'python3'
               },
-              "ansible_core" => {
-                "package_pip" => "ansible-core==#{@ee_ansible_core_version}"
+              'ansible_core' => {
+                'package_pip' => "ansible-core==#{@ee_ansible_core_version}"
               },
-              "ansible_runner" => {
-                "package_pip" => 'ansible-runner'
+              'ansible_runner' => {
+                'package_pip' => 'ansible-runner'
               },
-              "system" => ["openssh-clients"],
-              "galaxy" => ee_content
+              'system' => ['openssh-clients'],
+              'galaxy' => ee_content
             },
-            "additional_build_steps" => (
-                {
-                    "prepend_base" => [
-                        "ENV ANSIBLE_CALLBACK_WHITELIST=theforeman.foreman.foreman",
-                        "ENV ANSIBLE_CALLBACKS_ENABLED=theforeman.foreman.foreman",
-                        "ENV FOREMAN_URL=#{Proxy::SETTINGS.foreman_url.to_s}",
-                        "ENV FOREMAN_SSL_CERT=/run/secrets/foreman_ssl_cert",
-                        "ENV FOREMAN_SSL_KEY=/run/secrets/foreman_ssl_key",
-                        "ENV FOREMAN_SSL_VERIFY=/run/secrets/foreman_ssl_verify",
+            'additional_build_steps' => (
+                unless @is_base_image
+                  {
+                    'prepend_base' => [
+                      'ENV ANSIBLE_CALLBACK_WHITELIST=theforeman.foreman.foreman',
+                      'ENV ANSIBLE_CALLBACKS_ENABLED=theforeman.foreman.foreman',
+                      "ENV FOREMAN_URL=#{Proxy::SETTINGS.foreman_url}",
+                      'ENV FOREMAN_SSL_CERT=/run/secrets/foreman_ssl_cert',
+                      'ENV FOREMAN_SSL_KEY=/run/secrets/foreman_ssl_key',
+                      'ENV FOREMAN_SSL_VERIFY=/run/secrets/foreman_ssl_verify'
 
-                ]
-                } unless @is_base_image
-            )
+                    ]
+                  }
+                end
+              )
           }.compact
 
           build_args = {
-            ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-c',
+            ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-c'
           }
 
           build_args_str = ''
@@ -86,14 +88,14 @@ module Proxy
           end
 
           cmd = <<~CMD
-              TMPDIR=$(mktemp -d /tmp/execution-environment_ctx_XXXXXX)
-              echo $TMPDIR
-              cd $TMPDIR       
+            TMPDIR=$(mktemp -d /tmp/execution-environment_ctx_XXXXXX)
+            echo $TMPDIR
+            cd $TMPDIR
 
-              cat <<EOF > "execution-environment.yml"
-              #{YAML.dump(ee_definition, indentation: 2)}
-              EOF
-              ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -vvv --extra-build-cli-args='--tls-verify=false' --file execution-environment.yml #{build_args_str}
+            cat <<EOF > "execution-environment.yml"
+            #{YAML.dump(ee_definition, indentation: 2)}
+            EOF
+            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -vvv --extra-build-cli-args='--tls-verify=false' --file execution-environment.yml #{build_args_str}
           CMD
 
           initialize_command('bash', '-c', cmd)
