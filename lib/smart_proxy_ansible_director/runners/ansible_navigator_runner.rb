@@ -11,8 +11,13 @@ module Proxy
         def initialize(ansible_input, suspended_action: nil)
           super suspended_action: suspended_action
           @inventory = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_inventory(ansible_input[:inventory])
-          @playbook = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_playbook(ansible_input[:playbook])
-          @variables = ansible_input[:variables]
+          if ansible_input[:mode] == "literal"
+              @playbook = ansible_input[:playbook]
+              @variables = {}
+          else
+              @playbook = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_playbook(ansible_input[:playbook])
+              @variables = ansible_input[:variables]
+          end
           @execution_environment = ansible_input[:execution_environment]
         end
 
