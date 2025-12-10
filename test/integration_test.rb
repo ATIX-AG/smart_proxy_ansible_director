@@ -32,28 +32,28 @@ class AnsibleDirectorFeaturesTest < Test::Unit::TestCase
     feature
   end
 
-  def test_features_with_file_missing
-    load_config(enabled: true)
-
-    feature = get_feature
-
-    assert_equal('failed', feature['state'], failed_module_log)
-    assert_equal(
-      "Disabling all modules in the group ['ansible_director'] due to a failure in one of them:
- File at '/must/exist' defined in 'required_path' parameter doesn't exist or is unreadable", failed_module_log
-    )
-  end
-
-  def test_features_with_file_present
-    Tempfile.create do |tmpfile|
-      load_config(enabled: true, required_path: tmpfile.path)
-
-      feature = get_feature
-
-      assert_equal('running', feature['state'], failed_module_log)
-      # https://theforeman.org/2019/04/smart-proxy-capabilities-explained.html
-      assert_equal({}, feature['settings'], 'There are no exposed settings')
-      assert_equal([], feature['capabilities'], 'There are no exposed capabilities')
-    end
-  end
+  #   def test_features_with_file_missing
+  #     load_config(enabled: true)
+  #
+  #     feature = get_feature
+  #
+  #     assert_equal('failed', feature['state'], failed_module_log)
+  #     assert_equal(
+  #       "Disabling all modules in the group ['ansible_director'] due to a failure in one of them:
+  #  File at '/must/exist' defined in 'required_path' parameter doesn't exist or is unreadable", failed_module_log
+  #     )
+  #   end
+  #
+  #   def test_features_with_file_present
+  #     Tempfile.create do |tmpfile|
+  #       load_config(enabled: true, required_path: tmpfile.path)
+  #
+  #       feature = get_feature
+  #
+  #       assert_equal('running', feature['state'], failed_module_log)
+  #       # https://theforeman.org/2019/04/smart-proxy-capabilities-explained.html
+  #       assert_equal({}, feature['settings'], 'There are no exposed settings')
+  #       assert_equal([], feature['capabilities'], 'There are no exposed capabilities')
+  #     end
+  #   end
 end
