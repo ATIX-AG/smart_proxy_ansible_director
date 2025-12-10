@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.9')
 
-  s.add_development_dependency('mocha')
-  s.add_development_dependency('rake')
-  s.add_development_dependency('test-unit')
+  s.add_development_dependency('mocha', '~> 2.8')
+  s.add_development_dependency('rake', '~> 13.3')
+  s.add_development_dependency('test-unit', '~> 3.7')
 end
