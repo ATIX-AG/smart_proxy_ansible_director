@@ -5,7 +5,7 @@ require File.expand_path('lib/smart_proxy_ansible_director/version', __dir__)
 Gem::Specification.new do |s|
   s.name        = 'smart_proxy_ansible_director'
   s.version     = Proxy::AnsibleDirector::VERSION
-  s.license     = 'GPL-3.0'
+  s.license     = 'GPL-3.0-only'
   s.authors     = ['ATIX AG']
   s.email       = ['info@atix.de']
   s.homepage    = 'https://www.atix.de'
