@@ -6,9 +6,9 @@ Gem::Specification.new do |s|
   s.name        = 'smart_proxy_ansible_director'
   s.version     = Proxy::AnsibleDirector::VERSION
   s.license     = 'GPL-3.0'
-  s.authors     = ['Thorben Denzer']
-  s.email       = ['denzer@atix.de']
-  s.homepage    = 'https://example.com'
+  s.authors     = ['ATIX AG']
+  s.email       = ['info@atix.de']
+  s.homepage    = 'https://www.atix.de'
 
   s.summary     = "A Plugin for Foreman's smart proxy"
   s.description = "A longer description of the plugin for Foreman's smart proxy"
