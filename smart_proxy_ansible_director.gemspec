@@ -8,10 +8,10 @@ Gem::Specification.new do |s|
   s.license     = 'GPL-3.0-only'
   s.authors     = ['ATIX AG']
   s.email       = ['info@atix.de']
-  s.homepage    = 'https://www.atix.de'
+  s.homepage    = 'https://github.com/ATIX-AG/smart_proxy_ansible_director'
 
-  s.summary     = "A Plugin for Foreman's smart proxy"
-  s.description = "A longer description of the plugin for Foreman's smart proxy"
+  s.summary     = "Smart Proxy plugin to integrate Ansible Director with Foreman"
+  s.description = "This plugin adds support for the Ansible Director to Foreman's Smart Proxy"
 
   s.files       = Dir[
       '{lib/smart_proxy_ansible_director,bundler.d,settings.d}/**/*',
