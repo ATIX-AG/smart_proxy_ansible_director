@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ['info@atix.de']
   s.homepage    = 'https://github.com/ATIX-AG/smart_proxy_ansible_director'
 
-  s.summary     = "Smart Proxy plugin to integrate Ansible Director with Foreman"
+  s.summary     = 'Smart Proxy plugin to integrate Ansible Director with Foreman'
   s.description = "This plugin adds support for the Ansible Director to Foreman's Smart Proxy"
 
   s.files       = Dir[
