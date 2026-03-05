@@ -44,7 +44,7 @@ module Proxy
             'version' => 3,
             'images' => {
               'base_image' => {
-                'name' => 'localhost/ansibleng/1:latest'
+                'name' => @ee_base_image
               }
             },
             'dependencies' => {
