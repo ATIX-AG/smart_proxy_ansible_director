@@ -46,9 +46,12 @@ module Proxy
                 ee_formatted_content: ee_formatted_content,
                 is_base_image: true
               }
-              plan_action ::Proxy::AnsibleDirector::Actions::PushExecutionEnvironment, {
-                ee_id: ee_id
-              }
+              # COMPAT 3.16 - 3
+              # Registry authorization has not been finalized.
+              # Further, granular capability usage is difficult with the current execution stack.
+              # plan_action ::Proxy::AnsibleDirector::Actions::PushExecutionEnvironment, {
+              #  ee_id: ee_id
+              # }
             end
           end
         end
