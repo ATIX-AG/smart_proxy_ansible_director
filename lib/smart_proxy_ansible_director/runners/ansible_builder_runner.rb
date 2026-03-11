@@ -44,7 +44,7 @@ module Proxy
             'version' => 3,
             'images' => {
               'base_image' => {
-                'name' => 'localhost/ansibleng/1:latest'
+                'name' => @ee_base_image
               }
             },
             'dependencies' => {
@@ -87,6 +87,10 @@ module Proxy
             build_args_str += "--build-arg #{k}=\"#{v}\" "
           end
 
+          # COMPAT 3.16 - 2
+          # --extra-build-cli-args is not supported in ansible-builder 3.0.0
+          # Verbosity is chosen by passing -v {0, 1, 2, 3}
+
           cmd = <<~CMD
             TMPDIR=$(mktemp -d /tmp/execution-environment_ctx_XXXXXX)
             echo $TMPDIR
@@ -95,7 +99,7 @@ module Proxy
             cat <<EOF > "execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -vvv --extra-build-cli-args='--tls-verify=false' --file execution-environment.yml #{build_args_str}
+            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -v 3 --file execution-environment.yml #{build_args_str}
           CMD
 
           initialize_command('bash', '-c', cmd)
