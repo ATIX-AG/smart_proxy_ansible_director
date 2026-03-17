@@ -91,15 +91,14 @@ module Proxy
           # --extra-build-cli-args is not supported in ansible-builder 3.0.0
           # Verbosity is chosen by passing -v {0, 1, 2, 3}
 
+          # TODO: The build directory should be a setting at some point
           cmd = <<~CMD
-            TMPDIR=$(mktemp -d /tmp/execution-environment_ctx_XXXXXX)
-            echo $TMPDIR
-            cd $TMPDIR
+            BUILD_DIR="/usr/share/foreman-proxy/.ansible_director/execution_env"
 
-            cat <<EOF > "execution-environment.yml"
+            cat <<EOF > "${BUILD_DIR}/execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -v 3 --file execution-environment.yml #{build_args_str}
+            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -v 3 --file ${BUILD_DIR}/execution-environment.yml #{build_args_str} --context ${BUILD_DIR}
           CMD
 
           initialize_command('bash', '-c', cmd)
