@@ -47,36 +47,36 @@ module Proxy
               end.join("\n\n")
             }
 
-              cat > "ansible-navigator.yaml" <<'EOF'
-              ---
-              ansible-navigator:
-                ansible:
-                  inventory:
-                    entries:
-                      - ./inventory.yaml
-                  playbook:
-                    path: ./playbook.yaml
-                execution-environment:
-                  image: #{@execution_environment}
-                  pull:
-                    arguments:
-                      - "--tls-verify=false"
-                      - "--authfile=$AUTHFILE"
-                    policy: missing
-                  volume-mounts:
-                    - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_cert)}
-                      dest: /run/secrets/foreman_ssl_cert
-                      options: Z,ro
-                    - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_key)}
-                      dest: /run/secrets/foreman_ssl_key
-                      options: Z,ro
-                    - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_ca)}
-                      dest: /run/secrets/foreman_ssl_verify
-                      options: Z,ro
-                logging:
-                  level: debug
-                mode: stdout
-              EOF
+            cat > "ansible-navigator.yaml" <<'EOF'
+            ---
+            ansible-navigator:
+              ansible:
+                inventory:
+                  entries:
+                    - ./inventory.yaml
+                playbook:
+                  path: ./playbook.yaml
+              execution-environment:
+                image: #{@execution_environment}
+                pull:
+                  arguments:
+                    - "--tls-verify=false"
+                    - "--authfile=$AUTHFILE"
+                  policy: missing
+                volume-mounts:
+                  - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_cert)}
+                    dest: /run/secrets/foreman_ssl_cert
+                    options: Z,ro
+                  - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_key)}
+                    dest: /run/secrets/foreman_ssl_key
+                    options: Z,ro
+                  - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_ca)}
+                    dest: /run/secrets/foreman_ssl_verify
+                    options: Z,ro
+              logging:
+                level: debug
+              mode: stdout
+            EOF
 
             ansible-navigator run --mode stdout
           CMD
