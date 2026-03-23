@@ -27,9 +27,11 @@ module Proxy
           #             }
           #           }
           def plan(args)
-            execution_environment = args['execution_environment']
-            ee_id = execution_environment['id']
-            execution_environment_content = execution_environment['content']
+            execution_environment_definition = args['execution_environment']
+
+            ee_id = execution_environment_definition['id']
+            execution_environment_content = execution_environment_definition['content']
+
             ee_base_image = execution_environment_content['base_image']
             ee_base_image_tag = 'latest'
             ee_ansible_core_version = execution_environment_content['ansible_core_version']
@@ -40,8 +42,8 @@ module Proxy
             sequence do
               plan_action ::Proxy::AnsibleDirector::Actions::BuildExecutionEnvironment, {
                 ee_id: ee_id,
-                ee_base_image: ee_base_image,
-                ee_base_image_tag: ee_base_image_tag,
+                ee_base_image_url: ee_base_image,
+                ee_built_image_tag: ee_base_image_tag,
                 ee_ansible_core_version: ee_ansible_core_version,
                 ee_formatted_content: ee_formatted_content,
                 is_base_image: true
