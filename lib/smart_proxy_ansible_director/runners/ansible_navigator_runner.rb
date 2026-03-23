@@ -89,6 +89,10 @@ module Proxy
           publish_exit_status(@process_manager.status) if @process_manager.done?
         end
 
+        def publish_data(message, type = 'debug')
+            @continuous_output.add_output(message.force_encoding('UTF-8'), type)
+        end
+
         private
 
         def format_variables(_role_name, variables)
