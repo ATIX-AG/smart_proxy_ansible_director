@@ -16,9 +16,12 @@ module Proxy
         #   ee_formatted_content: ee_formatted_content
         # }
         def initialize(ansible_builder_input, suspended_action: nil)
+          # ID of the execution environment definition; supplied by Foreman
           @ee_id = ansible_builder_input[:ee_id]
-          @ee_base_image = ansible_builder_input[:ee_base_image]
-          @ee_base_image_tag = ansible_builder_input[:ee_base_image_tag]
+          # TAGGED registry URL of the base image; supplied by Foreman
+          @ee_base_image_url = ansible_builder_input[:ee_base_image_url]
+          # Tag used at the end of building for this image
+          @ee_built_image_tag = ansible_builder_input[:ee_built_image_tag]
           @ee_ansible_core_version = ansible_builder_input[:ee_ansible_core_version]
           @ee_formatted_content = ansible_builder_input[:ee_formatted_content]
           @is_base_image = ansible_builder_input[:is_base_image]
@@ -44,7 +47,7 @@ module Proxy
             'version' => 3,
             'images' => {
               'base_image' => {
-                'name' => @ee_base_image
+                'name' => @ee_base_image_url
               }
             },
             'dependencies' => {
@@ -98,7 +101,7 @@ module Proxy
             cat <<EOF > "${BUILD_DIR}/execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_base_image_tag} -v 3 --file ${BUILD_DIR}/execution-environment.yml #{build_args_str} --context ${BUILD_DIR}
+            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_built_image_tag} -v 3 --file ${BUILD_DIR}/execution-environment.yml #{build_args_str} --context ${BUILD_DIR}
           CMD
 
           initialize_command('bash', '-c', cmd)
