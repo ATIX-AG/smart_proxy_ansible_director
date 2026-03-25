@@ -8,6 +8,12 @@ module Proxy
       plugin :ansible_director, ::Proxy::AnsibleDirector::VERSION
       rackup_path File.expand_path('http_config.ru', __dir__)
 
+      default_settings(
+        ansible_navigator_run_dir: "/usr/share/foreman-proxy/.ansible_director/run",
+        execution_env_build_dir: "/usr/share/foreman-proxy/.ansible_director/execution_env",
+        remove_workdirs: true
+      )
+
       load_classes do
         require 'smart_proxy_dynflow'
         require 'smart_proxy_ansible_director/launchers'

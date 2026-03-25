@@ -21,41 +21,43 @@ module Proxy
             @variables = ansible_input[:variables]
           end
           @execution_environment = ansible_input[:execution_environment]
+
+          workdir_base = Proxy::AnsibleDirector::Plugin.settings[:ansible_navigator_run_dir]
+          @runner_workdir = Dir.mktmpdir('navigator', workdir_base)
         end
 
         def start
           # TODO: Find a way to request the auth token programmatically
           cmd = <<~CMD
+            echo "Running in #{@runner_workdir}"
 
-            TMPDIR=$(mktemp -d /tmp/ansible-run_XXXXXX)
-            echo $TMPDIR
-            cd $TMPDIR#{'       '}
-
-            cat > "playbook.yaml" <<'EOF'
+            cat > "#{@runner_workdir}/playbook.yaml" <<'EOF'
             #{@playbook}
             EOF
 
-            cat > "inventory.yaml" <<'EOF'
+            cat > "#{@runner_workdir}/inventory.yaml" <<'EOF'
             #{@inventory}
             EOF
 
-            mkdir vars
+            mkdir #{@runner_workdir}/vars
 
             #{
               @variables.map do |role_name, variables|
-                %(cat > "vars/#{role_name}_vars.yaml" <<'EOF'\n#{format_variables role_name, variables}EOF)
+                %(cat > "#{@runner_workdir}/vars/#{role_name}_vars.yaml" <<'EOF'\n#{format_variables role_name, variables}EOF)
               end.join("\n\n")
             }
 
-            cat > "ansible-navigator.yaml" <<'EOF'
+            cat > "#{@runner_workdir}/ansible-navigator.yml" <<'EOF'
             ---
             ansible-navigator:
               ansible:
                 inventory:
                   entries:
-                    - ./inventory.yaml
+                    - #{@runner_workdir}/inventory.yaml
                 playbook:
-                  path: ./playbook.yaml
+                  path: #{@runner_workdir}/playbook.yaml
+              ansible-runner:
+                artifact-dir: #{@runner_workdir}
               execution-environment:
                 image: #{@execution_environment}
                 pull:
@@ -78,7 +80,7 @@ module Proxy
               mode: stdout
             EOF
 
-            ansible-navigator run --mode stdout
+            ANSIBLE_NAVIGATOR_CONFIG=#{@runner_workdir}/ansible-navigator.yml ansible-navigator run --mode stdout
           CMD
           initialize_command('bash', '-c', cmd)
         end
@@ -91,6 +93,11 @@ module Proxy
 
         def publish_data(message, type = 'debug')
             @continuous_output.add_output(message.force_encoding('UTF-8'), type)
+        end
+
+        def close
+          remove_workdirs = Proxy::AnsibleDirector::Plugin.settings[:remove_workdirs]
+          FileUtils.rm_rf @runner_workdir if remove_workdirs
         end
 
         private
