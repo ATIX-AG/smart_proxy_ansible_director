@@ -25,6 +25,9 @@ module Proxy
           @ee_ansible_core_version = ansible_builder_input[:ee_ansible_core_version]
           @ee_formatted_content = ansible_builder_input[:ee_formatted_content]
           @is_base_image = ansible_builder_input[:is_base_image]
+
+          workdir_base = Proxy::AnsibleDirector::Plugin.settings[:execution_env_build_dir]
+          @runner_workdir = Dir.mktmpdir('execution_env', workdir_base)
           super suspended_action: suspended_action
         end
 
@@ -94,14 +97,13 @@ module Proxy
           # --extra-build-cli-args is not supported in ansible-builder 3.0.0
           # Verbosity is chosen by passing -v {0, 1, 2, 3}
 
-          # TODO: The build directory should be a setting at some point
           cmd = <<~CMD
-            BUILD_DIR="/usr/share/foreman-proxy/.ansible_director/execution_env"
+            echo "Running in #{@runner_workdir}"
 
-            cat <<EOF > "${BUILD_DIR}/execution-environment.yml"
+            cat <<EOF > "#{@runner_workdir}/execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_built_image_tag} -v 3 --file ${BUILD_DIR}/execution-environment.yml #{build_args_str} --context ${BUILD_DIR}
+            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_built_image_tag} -v 3 --file #{@runner_workdir}/execution-environment.yml #{build_args_str} --context #{@runner_workdir}
           CMD
 
           initialize_command('bash', '-c', cmd)
@@ -111,6 +113,11 @@ module Proxy
           @process_manager.process(timeout: 0.1) unless @process_manager.done?
           puts @continuous_output.raw_outputs
           publish_exit_status(@process_manager.status) if @process_manager.done?
+        end
+
+        def close
+          remove_workdirs = Proxy::AnsibleDirector::Plugin.settings[:remove_workdirs]
+          FileUtils.rm_rf @runner_workdir if remove_workdirs
         end
 
         def publish_data(message, type = 'debug')
