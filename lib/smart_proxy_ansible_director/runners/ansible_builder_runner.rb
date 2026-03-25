@@ -103,7 +103,7 @@ module Proxy
             cat <<EOF > "#{@runner_workdir}/execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansibleng/#{@ee_id}:#{@ee_built_image_tag} -v 3 --file #{@runner_workdir}/execution-environment.yml #{build_args_str} --context #{@runner_workdir}
+            ansible-builder build --tag ansible_director/#{@ee_id}:#{@ee_built_image_tag} -v 3 --file #{@runner_workdir}/execution-environment.yml #{build_args_str} --context #{@runner_workdir}
           CMD
 
           initialize_command('bash', '-c', cmd)
