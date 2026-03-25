@@ -18,7 +18,7 @@ module Proxy
         def start
           # TODO: Parametrize
 
-          image_name = "ansibleng/#{@ee_id}:latest"
+          image_name = "ansible_director/#{@ee_id}:latest"
           registry = 'centos9-katello-devel-stable.example.com:4321'
 
           cmd = <<~CMD
