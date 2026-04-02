@@ -72,6 +72,8 @@ module Proxy
                     dest: /run/secrets/foreman_ssl_key
                   - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_ca)}
                     dest: /run/secrets/foreman_ssl_verify
+                  - src: /usr/share/foreman-proxy/.ssh/id_rsa_foreman_proxy
+                    dest: /runner/.ssh/id_rsa_foreman_proxy
               logging:
                 level: debug
               mode: stdout
