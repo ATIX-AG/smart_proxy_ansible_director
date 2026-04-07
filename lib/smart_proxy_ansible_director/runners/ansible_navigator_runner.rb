@@ -76,6 +76,7 @@ module Proxy
                     dest: /runner/.ssh/id_rsa_foreman_proxy
               logging:
                 level: debug
+                file: #{@runner_workdir}/ansible-navigator.log
               mode: stdout
             EOF
 
