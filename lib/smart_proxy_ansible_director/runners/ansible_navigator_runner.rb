@@ -80,7 +80,8 @@ module Proxy
               mode: stdout
             EOF
 
-            ANSIBLE_NAVIGATOR_CONFIG=#{@runner_workdir}/ansible-navigator.yml ansible-navigator run --mode stdout
+            cd #{@runner_workdir}/
+            ansible-navigator run --mode stdout
           CMD
           initialize_command('bash', '-c', cmd)
         end
