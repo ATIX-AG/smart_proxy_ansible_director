@@ -20,14 +20,14 @@ class AnsibleDirectorFeaturesTest < Test::Unit::TestCase
   end
 
   def failed_module_log
-    Proxy::LogBuffer::Buffer.instance.info[:failed_modules][:pulsible]
+    Proxy::LogBuffer::Buffer.instance.info[:failed_modules][:Ansible_Director]
   end
 
   def get_feature
     get '/features'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     response = JSON.parse(last_response.body)
-    feature = response['pulsible']
+    feature = response['Ansible_Director']
     refute_nil(feature)
     feature
   end
