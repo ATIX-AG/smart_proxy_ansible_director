@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 3.0', '< 4'
 
-  s.add_runtime_dependency('smart_proxy_dynflow', '~> 0.9')
+  s.add_runtime_dependency('smart_proxy_dynflow', '>= 0.9.4', '< 2.0.0')
 
   s.add_development_dependency('mocha', '~> 2.8')
   s.add_development_dependency('rake', '~> 13.3')
