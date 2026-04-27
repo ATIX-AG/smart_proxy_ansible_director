@@ -8,6 +8,8 @@ module Proxy
       class AnsibleBuilderRunner < ::Proxy::Dynflow::Runner::Base
         include ::Proxy::Dynflow::Runner::ProcessManagerCommand
 
+        attr_reader :continuous_output, :exit_status
+
         # ansible_builder_input
         # {
         #   ee_id: ee_id,

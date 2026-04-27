@@ -10,6 +10,8 @@ module Proxy
       class AnsibleNavigatorRunner < ::Proxy::Dynflow::Runner::Base
         include ::Proxy::Dynflow::Runner::ProcessManagerCommand
 
+        attr_reader :continuous_output, :exit_status
+
         def initialize(ansible_input, suspended_action: nil)
           super suspended_action: suspended_action
           @inventory = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_inventory(ansible_input[:inventory])

@@ -11,9 +11,9 @@ module Proxy
 
             content_units.each do |content_unit|
               formatted_unit = {
-                name: content_unit['identifier'],
-                version: content_unit['version'],
-                source: content_unit['source']
+                'name' => content_unit['identifier'],
+                'version' => content_unit['version'],
+                'source' => content_unit['source']
               }
 
               case content_unit['type']
@@ -24,8 +24,8 @@ module Proxy
               end
             end
             {
-              collections: collections.length.positive? ? collections : nil,
-              roles: roles.length.positive? ? roles : nil
+              'collections' => collections.length.positive? ? collections : nil,
+              'roles' => roles.length.positive? ? roles : nil
             }.compact!
           end
 
