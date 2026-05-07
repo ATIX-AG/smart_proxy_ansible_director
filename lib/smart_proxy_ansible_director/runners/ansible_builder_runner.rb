@@ -30,6 +30,7 @@ module Proxy
 
           workdir_base = Proxy::AnsibleDirector::Plugin.settings[:execution_env_build_dir]
           @runner_workdir = Dir.mktmpdir('execution_env', workdir_base)
+          @cert_dir = nil
           super suspended_action: suspended_action
         end
 
@@ -99,8 +100,14 @@ module Proxy
           # --extra-build-cli-args is not supported in ansible-builder 3.0.0
           # Verbosity is chosen by passing -v {0, 1, 2, 3}
 
+          # Pre-pull the base image using the smart-proxy's SSL client certificate
+          # so ansible-builder can find it locally without needing registry credentials.
+          @cert_dir = ::Proxy::ContainerRegistry::PodmanAuth.setup_cert_dir
+          tls_args = ::Proxy::ContainerRegistry::PodmanAuth.tls_args(@cert_dir)
+
           cmd = <<~CMD
             echo "Running in #{@runner_workdir}"
+            podman pull #{tls_args} #{@ee_base_image_url}
 
             cat <<EOF > "#{@runner_workdir}/execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
@@ -120,6 +127,7 @@ module Proxy
         def close
           remove_workdirs = Proxy::AnsibleDirector::Plugin.settings[:remove_workdirs]
           FileUtils.rm_rf @runner_workdir if remove_workdirs
+          ::Proxy::ContainerRegistry::PodmanAuth.cleanup(@cert_dir)
         end
 
         def publish_data(message, type = 'debug')

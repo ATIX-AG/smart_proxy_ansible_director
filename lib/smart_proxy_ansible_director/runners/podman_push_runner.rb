@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'uri'
 require 'smart_proxy_dynflow/runner/process_manager_command'
 require_relative '../helpers/ansible_navigator_helpers'
 
@@ -11,19 +12,18 @@ module Proxy
 
         def initialize(podman_push_input, suspended_action: nil)
           super suspended_action: suspended_action
-          puts podman_push_input
           @ee_id = podman_push_input[:ee_id]
+          @cert_dir = nil
         end
 
         def start
-          # TODO: Parametrize
-
+          registry = URI.parse(Proxy::SETTINGS.foreman_url).host
           image_name = "ansible_director/#{@ee_id}:latest"
-          registry = 'centos9-katello-devel-stable.example.com:4321'
 
-          cmd = <<~CMD
-            podman push --tls-verify=false #{image_name} #{registry}/#{image_name}
-          CMD
+          @cert_dir = ::Proxy::ContainerRegistry::PodmanAuth.setup_cert_dir
+          tls_args = ::Proxy::ContainerRegistry::PodmanAuth.tls_args(@cert_dir)
+
+          cmd = "podman push #{tls_args} #{image_name} #{registry}/#{image_name}"
           initialize_command('bash', '-c', cmd)
         end
 
@@ -31,6 +31,10 @@ module Proxy
           @process_manager.process(timeout: 0.1) unless @process_manager.done?
           puts @continuous_output.humanize
           publish_exit_status(@process_manager.status) if @process_manager.done?
+        end
+
+        def close
+          ::Proxy::ContainerRegistry::PodmanAuth.cleanup(@cert_dir)
         end
 
         def publish_data(message, type = 'debug')

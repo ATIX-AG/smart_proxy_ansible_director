@@ -12,12 +12,13 @@ module Proxy
         def initialize(podman_pull_input, suspended_action: nil)
           super suspended_action: suspended_action
           @ee_registry_url = podman_pull_input[:ee_registry_url]
+          @cert_dir = nil
         end
 
         def start
-          cmd = <<~CMD
-            podman pull --tls-verify=false #{@ee_registry_url}
-          CMD
+          @cert_dir = ::Proxy::ContainerRegistry::PodmanAuth.setup_cert_dir
+          tls_args = ::Proxy::ContainerRegistry::PodmanAuth.tls_args(@cert_dir)
+          cmd = "podman pull #{tls_args} #{@ee_registry_url}"
           initialize_command('bash', '-c', cmd)
         end
 
@@ -25,6 +26,10 @@ module Proxy
           @process_manager.process(timeout: 0.1) unless @process_manager.done?
           puts @continuous_output.humanize
           publish_exit_status(@process_manager.status) if @process_manager.done?
+        end
+
+        def close
+          ::Proxy::ContainerRegistry::PodmanAuth.cleanup(@cert_dir)
         end
 
         def publish_data(message, type = 'debug')

@@ -16,6 +16,7 @@ module Proxy
 
       load_classes do
         require 'smart_proxy_dynflow'
+        require 'proxy/container_registry/podman_auth'
         require 'smart_proxy_ansible_director/launchers'
         require 'smart_proxy_ansible_director/actions'
         require 'smart_proxy_ansible_director/runners'
