@@ -35,6 +35,15 @@ module Proxy
 
         def start
           ee_content = @ee_formatted_content.to_hash
+          ee_content.transform_values! do |value|
+              value.map do |cuv|
+                {
+                  'name' => cuv['name'],
+                  'source' => cuv['source'],
+                  'version' => cuv['version']
+                }.compact
+              end
+          end
 
           if @is_base_image
             ee_content.merge!(
