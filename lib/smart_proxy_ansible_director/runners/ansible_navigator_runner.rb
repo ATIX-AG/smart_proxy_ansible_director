@@ -30,6 +30,8 @@ module Proxy
 
         def start
           # TODO: Find a way to request the auth token programmatically
+          proxy_ssh_key_path = ::Proxy::RemoteExecution::Ssh::Plugin.settings[:ssh_identity_key_file]
+          proxy_ssh_key_mount_path = "/runner/.ssh/#{File.basename(proxy_ssh_key_path)}"
           cmd = <<~CMD
             echo "Running in #{@runner_workdir}"
 
@@ -74,8 +76,8 @@ module Proxy
                     dest: /run/secrets/foreman_ssl_key
                   - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_ca)}
                     dest: /run/secrets/foreman_ssl_verify
-                  - src: /usr/share/foreman-proxy/.ssh/id_rsa_foreman_proxy
-                    dest: /runner/.ssh/id_rsa_foreman_proxy
+                  - src: #{proxy_ssh_key_path}
+                    dest: #{proxy_ssh_key_mount_path}
               logging:
                 level: debug
                 file: #{@runner_workdir}/ansible-navigator.log
@@ -83,7 +85,7 @@ module Proxy
             EOF
 
             cd #{@runner_workdir}/
-            ansible-navigator run --mode stdout
+            ansible-navigator run --private-key=#{proxy_ssh_key_mount_path}
           CMD
           initialize_command('bash', '-c', cmd)
         end
