@@ -21,7 +21,7 @@ module Proxy
 
             inventory = input['inventory']
             playbook = input['playbook']
-            variables = input['variables']
+            variables = input['variables'].to_hash
             content = ::Proxy::AnsibleDirector::Helpers::ExecutionEnvironmentHelpers.format_content(
               input['content']
             )
