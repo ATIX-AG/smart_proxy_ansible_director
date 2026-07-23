@@ -32,6 +32,12 @@ module Proxy
           # TODO: Find a way to request the auth token programmatically
           proxy_ssh_key_path = ::Proxy::RemoteExecution::Ssh::Plugin.settings[:ssh_identity_key_file]
           proxy_ssh_key_mount_path = "/runner/.ssh/#{File.basename(proxy_ssh_key_path)}"
+
+          foreman_certs_path = '/secrets/foreman/certs'
+          foreman_ssl_cert_mount_path = "#{foreman_certs_path}/#{File.basename(Proxy::SETTINGS.foreman_ssl_cert)}"
+          foreman_ssl_key_mount_path = "#{foreman_certs_path}/#{File.basename(Proxy::SETTINGS.foreman_ssl_key)}"
+          foreman_ssl_ca_mount_path = "#{foreman_certs_path}/#{File.basename(Proxy::SETTINGS.foreman_ssl_ca)}"
+
           cmd = <<~CMD
             echo "Running in #{@runner_workdir}"
 
@@ -70,14 +76,20 @@ module Proxy
                     - "--authfile=$AUTHFILE"
                   policy: missing
                 volume-mounts:
-                  - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_cert)}
-                    dest: /run/secrets/foreman_ssl_cert
-                  - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_key)}
-                    dest: /run/secrets/foreman_ssl_key
-                  - src: #{File.join(Dir.pwd, Proxy::SETTINGS.foreman_ssl_ca)}
-                    dest: /run/secrets/foreman_ssl_verify
+                  - src: #{Proxy::SETTINGS.foreman_ssl_cert}
+                    dest: #{foreman_ssl_cert_mount_path}
+                  - src: #{Proxy::SETTINGS.foreman_ssl_key}
+                    dest: #{foreman_ssl_key_mount_path}
+                  - src: #{Proxy::SETTINGS.foreman_ssl_ca}
+                    dest: #{foreman_ssl_ca_mount_path}
                   - src: #{proxy_ssh_key_path}
                     dest: #{proxy_ssh_key_mount_path}
+                environment-variables:
+                  set:
+                    FOREMAN_URL: #{Proxy::SETTINGS.foreman_url}
+                    FOREMAN_SSL_CERT: #{foreman_ssl_cert_mount_path}
+                    FOREMAN_SSL_KEY: #{foreman_ssl_key_mount_path}
+                    FOREMAN_SSL_VERIFY: #{foreman_ssl_ca_mount_path}
               logging:
                 level: debug
                 file: #{@runner_workdir}/ansible-navigator.log
