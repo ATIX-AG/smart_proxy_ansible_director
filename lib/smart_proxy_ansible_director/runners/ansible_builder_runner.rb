@@ -82,12 +82,7 @@ module Proxy
                   {
                     'prepend_base' => [
                       'ENV ANSIBLE_CALLBACK_WHITELIST=theforeman.foreman.foreman',
-                      'ENV ANSIBLE_CALLBACKS_ENABLED=theforeman.foreman.foreman',
-                      "ENV FOREMAN_URL=#{Proxy::SETTINGS.foreman_url}",
-                      'ENV FOREMAN_SSL_CERT=/run/secrets/foreman_ssl_cert',
-                      'ENV FOREMAN_SSL_KEY=/run/secrets/foreman_ssl_key',
-                      'ENV FOREMAN_SSL_VERIFY=/run/secrets/foreman_ssl_verify'
-
+                      'ENV ANSIBLE_CALLBACKS_ENABLED=theforeman.foreman.foreman'
                     ]
                   }
                 end
