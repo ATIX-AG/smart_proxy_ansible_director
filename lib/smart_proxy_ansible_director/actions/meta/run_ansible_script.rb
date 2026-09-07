@@ -21,7 +21,7 @@ module Proxy
                 mode: 'literal',
                 inventory: inventory,
                 playbook: script,
-                execution_environment: "#{execution_environment.split('/')[-1]}:latest"
+                execution_environment: execution_environment
               }
               plan_action ::Proxy::Dynflow::Callback::Action,
                           args[:callback],
