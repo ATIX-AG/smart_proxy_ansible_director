@@ -21,7 +21,7 @@ module Proxy
 
             inventory = input['inventory']
             playbook = input['playbook']
-            variables = input['variables'].to_hash
+            variable_files = input['variable_files'].to_hash
             content = ::Proxy::AnsibleDirector::Helpers::ExecutionEnvironmentHelpers.format_content(
               input['content']
             )
@@ -39,7 +39,7 @@ module Proxy
                 run_ansible_input: {
                   inventory: inventory,
                   playbook: playbook,
-                  variables: variables,
+                  variable_files: variable_files,
                   execution_environment: ee_registry_url.sub("latest",
                                                              @caller_execution_plan_id)
                 }

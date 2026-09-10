@@ -17,10 +17,10 @@ module Proxy
           @inventory = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_inventory(ansible_input[:inventory])
           if ansible_input[:mode] == 'literal'
             @playbook = ansible_input[:playbook]
-            @variables = {}
+            @variable_files = {}
           else
             @playbook = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_playbook(ansible_input[:playbook])
-            @variables = ansible_input[:variables]
+            @variable_files = ansible_input[:variable_files]
           end
           @execution_environment = ansible_input[:execution_environment]
 
@@ -52,8 +52,8 @@ module Proxy
             mkdir #{@runner_workdir}/vars
 
             #{
-              @variables.map do |role_name, variables|
-                %(cat > "#{@runner_workdir}/vars/#{role_name}_vars.yaml" <<'EOF'\n#{format_variables role_name, variables}EOF)
+              @variable_files.map do |file_name, file_content64|
+                %(cat > "#{@runner_workdir}/vars/#{file_name}" <<'EOF'\n#{Base64.decode64(file_content64)}EOF)
               end.join("\n\n")
             }
 
@@ -115,22 +115,6 @@ module Proxy
         def close
           remove_workdirs = Proxy::AnsibleDirector::Plugin.settings[:remove_workdirs]
           FileUtils.rm_rf @runner_workdir if remove_workdirs
-        end
-
-        private
-
-        def format_variables(_role_name, variables)
-          formatted = {}
-          variables.each do |k, v|
-            formatted_v = begin
-              YAML.safe_load v
-            rescue Exception
-              v
-            end
-            formatted[k] = formatted_v
-          end
-
-          formatted.to_h.to_yaml
         end
       end
     end
