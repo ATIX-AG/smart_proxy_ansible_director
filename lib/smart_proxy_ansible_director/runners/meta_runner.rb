@@ -6,6 +6,8 @@ module Proxy
   module AnsibleDirector
     module Runners
       class MetaRunner < ::Proxy::Dynflow::Runner::Base
+        CYAN = "\e[36m"
+        RESET = "\e[0m"
         PHASES = [
           { id: :build_ee, title: 'Building execution environment', runner_class: AnsibleBuilderRunner,
             runner_input_key: :build_ee_input },
@@ -59,7 +61,7 @@ module Proxy
           runner_input = @input[phase_info[:runner_input_key]]
 
           @continuous_output.add_output(
-            "START: Phase #{phase_info[:id]} (#{index + 1} / #{PHASES.length}): #{phase_info[:title]}\n"
+            "#{CYAN}START: Phase #{phase_info[:id]} (#{index + 1} / #{PHASES.length}): #{phase_info[:title]}#{RESET}\n"
           )
 
           @current_runner = runner_class.new(runner_input, suspended_action: @suspended_action)
@@ -69,7 +71,7 @@ module Proxy
         def transition_to_next_phase
           phase_info = PHASES[@phase_index]
           @continuous_output.add_output(
-            "END: Phase #{phase_info[:id]}: #{phase_info[:title]}\n"
+            "#{CYAN}END: Phase #{phase_info[:id]}: #{phase_info[:title]}#{RESET}\n"
           )
 
           if @phase_index + 1 < PHASES.length
