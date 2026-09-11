@@ -13,17 +13,19 @@ module Proxy
         def initialize(podman_push_input, suspended_action: nil)
           super suspended_action: suspended_action
           @ee_id = podman_push_input[:ee_id]
+          @ee_organization = podman_push_input[:ee_organization]
           @cert_dir = nil
         end
 
         def start
           registry = URI.parse(Proxy::SETTINGS.foreman_url).host
+          organization = @ee_organization.to_s.downcase
           image_name = "ansible_director/#{@ee_id}:latest"
 
           @cert_dir = ::Proxy::AnsibleDirector::ContainerRegistry::PodmanAuth.setup_cert_dir
           tls_args = ::Proxy::AnsibleDirector::ContainerRegistry::PodmanAuth.tls_args(@cert_dir)
 
-          cmd = "podman push #{tls_args} #{image_name} #{registry}/#{image_name}"
+          cmd = "podman push #{tls_args} #{image_name} docker://#{registry}/#{organization}/#{image_name}"
           initialize_command('bash', '-c', cmd)
         end
 
