@@ -12,6 +12,7 @@ module Proxy
           #           "action_input": {
           #             "execution_environment": {
           #               "id": 1,
+          #               "organization": "ATIX",
           #               "content": {
           #                 "base_image": "registry.fedoraproject.org/fedora:42",
           #                 "ansible_core_version": "",
@@ -30,6 +31,7 @@ module Proxy
             execution_environment_definition = args['execution_environment']
 
             ee_id = execution_environment_definition['id']
+            ee_organization = execution_environment_definition['organization']
             execution_environment_content = execution_environment_definition['content']
 
             ee_base_image = execution_environment_content['base_image']
@@ -48,12 +50,10 @@ module Proxy
                 ee_formatted_content: ee_formatted_content,
                 is_base_image: true
               }
-              # COMPAT 3.16 - 3
-              # Registry authorization has not been finalized.
-              # Further, granular capability usage is difficult with the current execution stack.
-              # plan_action ::Proxy::AnsibleDirector::Actions::PushExecutionEnvironment, {
-              #  ee_id: ee_id
-              # }
+              plan_action ::Proxy::AnsibleDirector::Actions::PushExecutionEnvironment, {
+                ee_id: ee_id,
+                ee_organization: ee_organization
+              }
             end
           end
         end
