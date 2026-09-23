@@ -8,15 +8,10 @@ module Proxy
       class MetaRunner < ::Proxy::Dynflow::Runner::Base
         CYAN = "\e[36m"
         RESET = "\e[0m"
-        PHASES = [
-          { id: :build_ee, title: 'Building execution environment', runner_class: AnsibleBuilderRunner,
-            runner_input_key: :build_ee_input },
-          { id: :run_ansible, title: 'Running Ansible', runner_class: AnsibleNavigatorRunner,
-            runner_input_key: :run_ansible_input }
-        ].freeze
 
-        def initialize(input, suspended_action: nil)
+        def initialize(phases, input, suspended_action: nil)
           super(suspended_action: suspended_action)
+          @phases = phases
           @input = input
           @phase_index = 0
           @current_runner = nil
@@ -54,14 +49,14 @@ module Proxy
         private
 
         def transition_to_phase(index)
-          phase_info = PHASES[index]
+          phase_info = @phases[index]
 
           @phase_index = index
           runner_class = phase_info[:runner_class]
           runner_input = @input[phase_info[:runner_input_key]]
 
           @continuous_output.add_output(
-            "#{CYAN}START: Phase #{phase_info[:id]} (#{index + 1} / #{PHASES.length}): #{phase_info[:title]}#{RESET}\n"
+            "#{CYAN}START: Phase #{phase_info[:id]} (#{index + 1} / #{@phases.length}): #{phase_info[:title]}#{RESET}\n"
           )
 
           @current_runner = runner_class.new(runner_input, suspended_action: @suspended_action)
@@ -69,12 +64,12 @@ module Proxy
         end
 
         def transition_to_next_phase
-          phase_info = PHASES[@phase_index]
+          phase_info = @phases[@phase_index]
           @continuous_output.add_output(
             "#{CYAN}END: Phase #{phase_info[:id]}: #{phase_info[:title]}#{RESET}\n"
           )
 
-          if @phase_index + 1 < PHASES.length
+          if @phase_index + 1 < @phases.length
             @phase_index += 1
             transition_to_phase(@phase_index)
           else

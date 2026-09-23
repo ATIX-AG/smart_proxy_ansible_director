@@ -9,20 +9,20 @@ module Proxy
       class PodmanPushRunner < ::Proxy::Dynflow::Runner::Base
         include ::Proxy::Dynflow::Runner::ProcessManagerCommand
 
+        attr_reader :continuous_output, :exit_status
+
         def initialize(podman_push_input, suspended_action: nil)
           super suspended_action: suspended_action
-          puts podman_push_input
-          @ee_id = podman_push_input[:ee_id]
+          @push_url = podman_push_input[:push_url]
         end
 
         def start
-          # TODO: Parametrize
-
-          image_name = "ansible_director/#{@ee_id}:latest"
-          registry = 'centos9-katello-devel-stable.example.com:4321'
-
+          cert_dir = File.join(
+            Proxy::AnsibleDirector::Plugin.settings[:workdir_root],
+            'certs'
+          )
           cmd = <<~CMD
-            podman push --tls-verify=false #{image_name} #{registry}/#{image_name}
+            podman push --cert-dir #{cert_dir} #{@push_url}
           CMD
           initialize_command('bash', '-c', cmd)
         end
