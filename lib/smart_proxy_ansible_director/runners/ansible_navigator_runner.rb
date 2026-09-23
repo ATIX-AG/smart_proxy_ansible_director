@@ -24,7 +24,10 @@ module Proxy
           end
           @execution_environment = ansible_input[:execution_environment]
 
-          workdir_base = Proxy::AnsibleDirector::Plugin.settings[:ansible_navigator_run_dir]
+          workdir_base = File.join(
+            Proxy::AnsibleDirector::Plugin.settings[:workdir_root],
+            Proxy::AnsibleDirector::Plugin.settings[:ansible_navigator_run_dir]
+          )
           @runner_workdir = Dir.mktmpdir('navigator', workdir_base)
         end
 

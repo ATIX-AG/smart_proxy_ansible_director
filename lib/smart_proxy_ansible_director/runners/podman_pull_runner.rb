@@ -15,8 +15,12 @@ module Proxy
         end
 
         def start
+          cert_dir = File.join(
+            Proxy::AnsibleDirector::Plugin.settings[:workdir_root],
+            'certs'
+          )
           cmd = <<~CMD
-            podman pull --tls-verify=false #{@ee_registry_url}
+            podman pull --cert-dir #{cert_dir} #{@ee_registry_url}
           CMD
           initialize_command('bash', '-c', cmd)
         end
