@@ -3,21 +3,32 @@
 require_relative '../build_execution_environment'
 require_relative '../push_execution_environment'
 require_relative '../../helpers/execution_environment_helpers'
+require_relative '../../runners/ansible_builder_runner'
+require_relative '../../runners/ansible_navigator_runner'
 require_relative '../../runners/meta_runner'
-require 'smart_proxy_dynflow/callback'
 
 module Proxy
   module AnsibleDirector
     module Actions
       module Meta
         class RunPlaybook < ::Proxy::Dynflow::Action::Runner
+          RUNNER_PHASES = [
+            { id: :build_ee, title: 'Building execution environment',
+              runner_class: ::Proxy::AnsibleDirector::Runners::AnsibleBuilderRunner,
+              runner_input_key: :build_ee_input },
+            { id: :run_ansible, title: 'Running Ansible',
+              runner_class: ::Proxy::AnsibleDirector::Runners::AnsibleNavigatorRunner,
+              runner_input_key: :run_ansible_input }
+          ].freeze
+
           def initiate_runner
             execution_environment = input['execution_environment']
 
-            ee_id = execution_environment['id']
-            ee_registry_url = execution_environment['registry_url']
+            ee_pull_url = execution_environment['pull_url']
             ee_ansible_core_version = execution_environment['ansible_core_version']
 
+            ee_run_image_tag = ee_pull_url.sub("latest",
+                                               @caller_execution_plan_id)
 
             inventory = input['inventory']
             playbook = input['playbook']
@@ -27,11 +38,11 @@ module Proxy
             )
 
             ::Proxy::AnsibleDirector::Runners::MetaRunner.new(
+              RUNNER_PHASES,
               {
                 build_ee_input: {
-                  ee_id: ee_id,
-                  ee_base_image_url: ee_registry_url,
-                  ee_built_image_tag: @caller_execution_plan_id,
+                  ee_base_image_url: ee_pull_url,
+                  ee_built_image_tag: ee_run_image_tag,
                   ee_ansible_core_version: ee_ansible_core_version,
                   ee_formatted_content: content,
                   is_base_image: false
@@ -40,8 +51,7 @@ module Proxy
                   inventory: inventory,
                   playbook: playbook,
                   variable_files: variable_files,
-                  execution_environment: ee_registry_url.sub("latest",
-                                                             @caller_execution_plan_id)
+                  execution_environment: ee_run_image_tag
                 }
               }
             )
