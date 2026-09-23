@@ -18,8 +18,6 @@ module Proxy
         #   ee_formatted_content: ee_formatted_content
         # }
         def initialize(ansible_builder_input, suspended_action: nil)
-          # ID of the execution environment definition; supplied by Foreman
-          @ee_id = ansible_builder_input[:ee_id]
           # TAGGED registry URL of the base image; supplied by Foreman
           @ee_base_image_url = ansible_builder_input[:ee_base_image_url]
           # Tag used at the end of building for this image
@@ -28,12 +26,19 @@ module Proxy
           @ee_formatted_content = ansible_builder_input[:ee_formatted_content]
           @is_base_image = ansible_builder_input[:is_base_image]
 
-          workdir_base = Proxy::AnsibleDirector::Plugin.settings[:execution_env_build_dir]
+          workdir_base = File.join(
+            Proxy::AnsibleDirector::Plugin.settings[:workdir_root],
+            Proxy::AnsibleDirector::Plugin.settings[:execution_env_build_dir]
+          )
           @runner_workdir = Dir.mktmpdir('execution_env', workdir_base)
           super suspended_action: suspended_action
         end
 
         def start
+          cert_dir = File.join(
+            Proxy::AnsibleDirector::Plugin.settings[:workdir_root],
+            'certs'
+          )
           ee_content = @ee_formatted_content.to_hash
           ee_content.transform_values! do |value|
               value.map do |cuv|
@@ -102,14 +107,14 @@ module Proxy
           # COMPAT 3.16 - 2
           # --extra-build-cli-args is not supported in ansible-builder 3.0.0
           # Verbosity is chosen by passing -v {0, 1, 2, 3}
-
           cmd = <<~CMD
             echo "Running in #{@runner_workdir}"
 
             cat <<EOF > "#{@runner_workdir}/execution-environment.yml"
             #{YAML.dump(ee_definition, indentation: 2)}
             EOF
-            ansible-builder build --tag ansible_director/#{@ee_id}:#{@ee_built_image_tag} -v 3 --file #{@runner_workdir}/execution-environment.yml #{build_args_str} --context #{@runner_workdir}
+            ansible-builder create --verbosity 3 --file #{@runner_workdir}/execution-environment.yml --context #{@runner_workdir}
+            podman build --cert-dir #{cert_dir} --tag #{@ee_built_image_tag} --log-level=info --tag #{@ee_built_image_tag} #{build_args_str} #{@runner_workdir}
           CMD
 
           initialize_command('bash', '-c', cmd)
