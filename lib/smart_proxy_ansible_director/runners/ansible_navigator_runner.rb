@@ -22,6 +22,7 @@ module Proxy
             @playbook = ::Proxy::AnsibleDirector::Helpers::AnsibleNavigatorHelpers.reserialize_playbook(ansible_input[:playbook])
             @variable_files = ansible_input[:variable_files]
           end
+          @options = ansible_input[:options]
           @execution_environment = ansible_input[:execution_environment]
 
           workdir_base = File.join(
@@ -33,7 +34,8 @@ module Proxy
 
         def start
           # TODO: Find a way to request the auth token programmatically
-          proxy_ssh_key_path = ::Proxy::RemoteExecution::Ssh::Plugin.settings[:ssh_identity_key_file]
+          proxy_ssh_key_path = @options[:ansible_ssh_private_key_file] ||
+                               ::Proxy::RemoteExecution::Ssh::Plugin.settings[:ssh_identity_key_file]
           proxy_ssh_key_mount_path = "/runner/.ssh/#{File.basename(proxy_ssh_key_path)}"
 
           foreman_certs_path = '/secrets/foreman/certs'
@@ -43,6 +45,10 @@ module Proxy
 
           cmd = <<~CMD
             echo "Running in #{@runner_workdir}"
+
+            if ! ssh-keygen -lf #{proxy_ssh_key_path}; then
+              exit 1
+            fi
 
             cat > "#{@runner_workdir}/playbook.yaml" <<'EOF'
             #{@playbook}
