@@ -31,6 +31,7 @@ module Proxy
                                                @caller_execution_plan_id)
 
             inventory = input['inventory']
+            options = input['options']
             playbook = input['playbook']
             variable_files = input['variable_files'].to_hash
             content = ::Proxy::AnsibleDirector::Helpers::ExecutionEnvironmentHelpers.format_content(
@@ -50,6 +51,7 @@ module Proxy
                 run_ansible_input: {
                   inventory: inventory,
                   playbook: playbook,
+                  options: options,
                   variable_files: variable_files,
                   execution_environment: ee_run_image_tag
                 }
