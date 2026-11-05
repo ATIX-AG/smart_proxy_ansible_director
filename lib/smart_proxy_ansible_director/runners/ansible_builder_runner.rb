@@ -70,18 +70,12 @@ module Proxy
               }
             },
             'dependencies' => {
-              'python_interpreter' => {
-                'package_system' => 'python3'
-              },
-              'ansible_core' => {
-                'package_pip' => "ansible-core==#{@ee_ansible_core_version}"
-              },
-              'ansible_runner' => {
-                'package_pip' => 'ansible-runner'
-              },
-              'system' => ['openssh-clients'],
+              'python_interpreter' => ({ 'package_system' => 'python3' } if @is_base_image),
+              'ansible_core' => ({ 'package_pip' => "ansible-core==#{@ee_ansible_core_version}" } if @is_base_image),
+              'ansible_runner' => ({ 'package_pip' => 'ansible-runner' } if @is_base_image),
+              'system' => (['openssh-clients'] if @is_base_image),
               'galaxy' => ee_content
-            },
+            }.compact,
             'additional_build_steps' => (
                 unless @is_base_image
                   {
