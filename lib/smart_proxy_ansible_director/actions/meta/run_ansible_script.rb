@@ -12,6 +12,7 @@ module Proxy
             script = args['script']
             execution_environment = args['execution_environment']
             inventory = args['inventory']
+            options = args['options']
 
             sequence do
               _pull_ee_action = plan_action ::Proxy::AnsibleDirector::Actions::PullExecutionEnvironment, {
@@ -21,6 +22,7 @@ module Proxy
                 mode: 'literal',
                 inventory: inventory,
                 playbook: script,
+                options: options,
                 execution_environment: execution_environment
               }
               plan_action ::Proxy::Dynflow::Callback::Action,
